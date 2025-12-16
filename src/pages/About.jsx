@@ -1,21 +1,28 @@
 import React from 'react'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
+import { MdOutlineGpsFixed, MdRemoveRedEye, MdStarRate } from 'react-icons/md'
 
 export default function About() {
+    const iconMap = {
+        mission: MdOutlineGpsFixed,
+        vision: MdRemoveRedEye,
+        values: MdStarRate
+    }
+
     const features = [
         {
-            icon: '🎯',
+            icon: 'mission',
             title: 'Nuestra Misión',
             desc: 'Proporcionar soluciones en vidrio y aluminio de la más alta calidad, con un servicio personalizado que supere las expectativas de nuestros clientes.'
         },
         {
-            icon: '👁️',
+            icon: 'vision',
             title: 'Nuestra Visión',
             desc: 'Ser la empresa líder en soluciones de vidrio y aluminio, reconocida por nuestra excelencia, innovación y compromiso con la satisfacción del cliente.'
         },
         {
-            icon: '⭐',
+            icon: 'values',
             title: 'Nuestros Valores',
             desc: 'Calidad, honestidad, puntualidad, profesionalismo y compromiso con cada proyecto que realizamos.'
         }
@@ -53,7 +60,9 @@ export default function About() {
                 <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 24 }}>
                     {features.map(f => (
                         <div className="card" key={f.title} style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '3rem', marginBottom: 12 }}>{f.icon}</div>
+                            {React.createElement(iconMap[f.icon], {
+                                style: { fontSize: '3rem', marginBottom: 12, color: f.icon === 'mission' ? '#ef4444' : f.icon === 'vision' ? '#3b82f6' : '#fbbf24' }
+                            })}
                             <h3 style={{ marginBottom: 8 }}>{f.title}</h3>
                             <p style={{ color: '#475569', lineHeight: 1.6 }}>{f.desc}</p>
                         </div>
@@ -71,11 +80,11 @@ export default function About() {
                     </div>
                     <div className="card">
                         <h4>✓ Materiales Premium</h4>
-                        <p style={{ color: '#475569' }}>Vidrios certificados y herrajes de primera calidad</p>
+                        <p style={{ color: '#475569' }}>Vidrios certificados  de primera calidad</p>
                     </div>
                     <div className="card">
-                        <h4>✓ Garantía Extendida</h4>
-                        <p style={{ color: '#475569' }}>Garantía de hasta 5 años en todos nuestros productos</p>
+                        <h4>✓ Garantía</h4>
+                        <p style={{ color: '#475569' }}>Garantía de en todos nuestros productos</p>
                     </div>
                     <div className="card">
                         <h4>✓ Atención Personalizada</h4>

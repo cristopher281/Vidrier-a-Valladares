@@ -54,69 +54,62 @@ export default function Quote() {
                 <div className="grid" style={{ gridTemplateColumns: '1.5fr 1fr', gap: 32, alignItems: 'start' }}>
 
                     {/* Quote Form */}
-                    <div className="card">
+                    <div className="form-card">
                         {submitted && (
-                            <div style={{
-                                padding: 16,
-                                background: '#10b981',
-                                color: 'white',
-                                borderRadius: 8,
-                                marginBottom: 20,
-                                textAlign: 'center',
-                                fontSize: '1.1rem'
-                            }}>
-                                ✓ Solicitud enviada con éxito. Te contactaremos pronto con tu presupuesto.
+                            <div className="form-success">
+                                Solicitud enviada con éxito. Te contactaremos pronto con tu presupuesto.
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 16 }}>
+                        <form onSubmit={handleSubmit} className="form-modern">
 
-                            <h3>Información de Contacto</h3>
+                            <h3 className="form-section-header">Información de Contacto</h3>
 
-                            <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                                <div>
-                                    <label style={{ display: 'block', marginBottom: 6, fontWeight: 600 }}>Nombre Completo *</label>
+                            <div className="form-grid-2">
+                                <div className="form-field-floating form-field">
                                     <input
                                         required
-                                        placeholder="Tu nombre"
+                                        className="form-input"
+                                        placeholder=" "
                                         value={form.name}
                                         onChange={e => setForm({ ...form, name: e.target.value })}
                                     />
+                                    <label className="form-label-floating">Nombre Completo *</label>
                                 </div>
 
-                                <div>
-                                    <label style={{ display: 'block', marginBottom: 6, fontWeight: 600 }}>Teléfono *</label>
+                                <div className="form-field-floating form-field">
                                     <input
                                         required
                                         type="tel"
-                                        placeholder="+549 11 1234 5678"
+                                        className="form-input"
+                                        placeholder=" "
                                         value={form.phone}
                                         onChange={e => setForm({ ...form, phone: e.target.value })}
                                     />
+                                    <label className="form-label-floating">Teléfono *</label>
                                 </div>
                             </div>
 
-                            <div>
-                                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600 }}>Email *</label>
+                            <div className="form-field-floating form-field">
                                 <input
                                     required
                                     type="email"
-                                    placeholder="tu@email.com"
+                                    className="form-input"
+                                    placeholder=" "
                                     value={form.email}
                                     onChange={e => setForm({ ...form, email: e.target.value })}
                                 />
+                                <label className="form-label-floating">Email *</label>
                             </div>
 
-                            <hr style={{ border: '1px solid rgba(0,0,0,0.05)', margin: '8px 0' }} />
+                            <h3 className="form-section-header" style={{ marginTop: '1rem' }}>Detalles del Producto</h3>
 
-                            <h3>Detalles del Producto</h3>
-
-                            <div>
-                                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600 }}>Tipo de Producto *</label>
+                            <div className="form-field">
+                                <label className="form-label">Tipo de Producto *</label>
                                 <select
                                     value={form.productType}
                                     onChange={e => setForm({ ...form, productType: e.target.value })}
-                                    style={{ width: '100%', padding: '0.6rem', borderRadius: 8, border: '1px solid rgba(0,0,0,0.1)' }}
+                                    className="form-select"
                                 >
                                     <option>Vidrio templado</option>
                                     <option>Vidrio laminado</option>
@@ -129,58 +122,62 @@ export default function Quote() {
                                 </select>
                             </div>
 
-                            <div className="grid" style={{ gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-                                <div>
-                                    <label style={{ display: 'block', marginBottom: 6, fontWeight: 600 }}>Ancho (cm)</label>
+                            <div className="form-grid-3">
+                                <div className="form-field-floating form-field">
                                     <input
                                         type="number"
-                                        placeholder="100"
+                                        className="form-input"
+                                        placeholder=" "
                                         value={form.width}
                                         onChange={e => setForm({ ...form, width: e.target.value })}
                                     />
+                                    <label className="form-label-floating">Ancho (cm)</label>
                                 </div>
 
-                                <div>
-                                    <label style={{ display: 'block', marginBottom: 6, fontWeight: 600 }}>Alto (cm)</label>
+                                <div className="form-field-floating form-field">
                                     <input
                                         type="number"
-                                        placeholder="150"
+                                        className="form-input"
+                                        placeholder=" "
                                         value={form.height}
                                         onChange={e => setForm({ ...form, height: e.target.value })}
                                     />
+                                    <label className="form-label-floating">Alto (cm)</label>
                                 </div>
 
-                                <div>
-                                    <label style={{ display: 'block', marginBottom: 6, fontWeight: 600 }}>Cantidad *</label>
+                                <div className="form-field-floating form-field">
                                     <input
                                         required
                                         type="number"
                                         min="1"
+                                        className="form-input"
+                                        placeholder=" "
                                         value={form.quantity}
                                         onChange={e => setForm({ ...form, quantity: e.target.value })}
                                     />
+                                    <label className="form-label-floating">Cantidad *</label>
                                 </div>
                             </div>
 
-                            <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                                <div>
-                                    <label style={{ display: 'block', marginBottom: 6, fontWeight: 600 }}>¿Necesita instalación? *</label>
+                            <div className="form-grid-2">
+                                <div className="form-field">
+                                    <label className="form-label">¿Necesita instalación? *</label>
                                     <select
                                         value={form.installation}
                                         onChange={e => setForm({ ...form, installation: e.target.value })}
-                                        style={{ width: '100%', padding: '0.6rem', borderRadius: 8, border: '1px solid rgba(0,0,0,0.1)' }}
+                                        className="form-select"
                                     >
                                         <option value="yes">Sí, incluir instalación</option>
                                         <option value="no">No, solo el producto</option>
                                     </select>
                                 </div>
 
-                                <div>
-                                    <label style={{ display: 'block', marginBottom: 6, fontWeight: 600 }}>Urgencia *</label>
+                                <div className="form-field">
+                                    <label className="form-label">Urgencia *</label>
                                     <select
                                         value={form.urgency}
                                         onChange={e => setForm({ ...form, urgency: e.target.value })}
-                                        style={{ width: '100%', padding: '0.6rem', borderRadius: 8, border: '1px solid rgba(0,0,0,0.1)' }}
+                                        className="form-select"
                                     >
                                         <option value="normal">Normal (7-15 días)</option>
                                         <option value="urgent">Urgente (3-5 días)</option>
@@ -189,18 +186,17 @@ export default function Quote() {
                                 </div>
                             </div>
 
-                            <div>
-                                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600 }}>Detalles Adicionales</label>
+                            <div className="form-field-floating form-field">
                                 <textarea
-                                    rows={4}
-                                    placeholder="Especifica color, acabados, medidas exactas, ubicación, o cualquier detalle relevante..."
+                                    className="form-textarea"
+                                    placeholder=" "
                                     value={form.details}
                                     onChange={e => setForm({ ...form, details: e.target.value })}
-                                    style={{ resize: 'vertical' }}
                                 />
+                                <label className="form-label-floating">Detalles Adicionales</label>
                             </div>
 
-                            <button className="btn" type="submit" style={{ marginTop: 8 }}>
+                            <button className="form-submit-btn" type="submit">
                                 Solicitar Presupuesto
                             </button>
                         </form>

@@ -75,9 +75,9 @@ export default function Admin() {
   if (!auth) return <Login onLogin={() => setAuth(true)} />
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div className="admin-layout">
       <AdminSidebar />
-      <main style={{ flex: 1, padding: '2rem', background: 'var(--bg)' }}>
+      <main className="admin-main">
         <div className="admin-header fade-in">
           <h1>Administración</h1>
           <div className="admin-actions">

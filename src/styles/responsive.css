@@ -132,6 +132,109 @@ body.mobile-menu-open {
   }
 }
 
+/* Admin-specific responsive rules */
+/* Layout wrapper (desktop: side-by-side, mobile: stacked) */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 2rem;
+  background: var(--bg);
+}
+
+@media (max-width: 768px) {
+  .admin-layout {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100% !important;
+    min-height: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .admin-sidebar nav {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 0 0.5rem;
+  }
+
+  .sidebar-item {
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    min-width: 76px;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .admin-main {
+    padding: 1rem;
+  }
+
+  /* Make inventory cards and grids tighter */
+  .inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .inventory-card {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .inventory-thumb {
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  /* Responsive tables: stack table rows into cards */
+  .materials-table-wrapper {
+    overflow: hidden;
+  }
+
+  .materials-table thead {
+    display: none;
+  }
+
+  .materials-table tbody tr {
+    display: block;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    margin-bottom: 8px;
+    padding: 10px 0;
+  }
+
+  .materials-table tbody tr td {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+  }
+
+  .material-cell {
+    gap: 8px;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+  }
+}
+
 /* Avoid image overflow */
 img,
 svg {

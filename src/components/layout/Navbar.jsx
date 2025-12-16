@@ -4,9 +4,9 @@ import { Link, useNavigate } from 'react-router-dom'
 export default function Navbar() {
   const nav = useNavigate()
   return (
-    <header className="container navbar">
+    <header className="container navbar site-navbar">
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ fontWeight: 700, color: '#0b78d1' }}>Vidrieria Valladares</div>
+        <Link to="/" style={{ fontWeight: 800, color: 'var(--primary)', textDecoration: 'none' }}>Vidriería Valladares</Link>
       </div>
       <nav className="nav-links">
         <Link to="/">Inicio</Link>

@@ -34,29 +34,55 @@ export default function ProductForm({initial, onSave, onCancel}){
   }
 
   return (
-    <form onSubmit={submit} style={{display:'grid',gap:8}}>
+    <form onSubmit={submit} style={{display:'grid',gap:12}}>
       <div>
-        <label>Imagen</label>
+        <label className="form-label">Imagen</label>
         <div
           onDragOver={(e)=>{e.preventDefault(); setDragOver(true)}}
           onDragLeave={()=>setDragOver(false)}
           onDrop={onDrop}
           onClick={()=>fileInputRef.current && fileInputRef.current.click()}
+          className="card"
           style={{border: `2px dashed ${dragOver? 'var(--accent)': 'rgba(255,255,255,0.06)'}`, padding:12, borderRadius:8, cursor:'pointer', display:'flex',alignItems:'center',gap:12}}
         >
           <div style={{flex:1,color:'var(--muted)'}}>{form.img? 'Haz clic o arrastra para reemplazar la imagen' : 'Arrastra una imagen aquí o haz clic para subir'}</div>
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFile} style={{display:'none'}} />
         </div>
-        {form.img && <img src={form.img} alt="preview" style={{width:160,marginTop:8,borderRadius:6}} />}
+        {form.img && <div style={{display:'flex',alignItems:'center',gap:12,marginTop:8}}>
+          <img src={form.img} alt="preview" style={{width:160,borderRadius:8,boxShadow:'var(--card-shadow)'}} />
+          <div style={{color:'var(--muted)'}}>Vista previa de la imagen seleccionada</div>
+        </div>}
       </div>
-      <input placeholder="Nombre" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} />
-      <input type="number" placeholder="Precio" value={form.price} onChange={e=>setForm({...form,price:e.target.value})} />
-      <input type="number" placeholder="Stock" value={form.stock} onChange={e=>setForm({...form,stock:e.target.value})} />
-      <input placeholder="Categoría" value={form.category} onChange={e=>setForm({...form,category:e.target.value})} />
-      <textarea placeholder="Descripción" value={form.description} onChange={e=>setForm({...form,description:e.target.value})} />
+
+      <div className="form-group floating">
+        <input className="input" placeholder=" " value={form.name} onChange={e=>setForm({...form,name:e.target.value})} />
+        <label className="form-label">Nombre</label>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+        <div className="form-group floating">
+          <input className="input" type="number" placeholder=" " value={form.price} onChange={e=>setForm({...form,price:e.target.value})} />
+          <label className="form-label">Precio</label>
+        </div>
+        <div className="form-group floating">
+          <input className="input" type="number" placeholder=" " value={form.stock} onChange={e=>setForm({...form,stock:e.target.value})} />
+          <label className="form-label">Stock</label>
+        </div>
+      </div>
+
+      <div className="form-group floating">
+        <input className="input" placeholder=" " value={form.category} onChange={e=>setForm({...form,category:e.target.value})} />
+        <label className="form-label">Categoría</label>
+      </div>
+
+      <div className="form-group">
+        <textarea className="textarea" placeholder=" " value={form.description} onChange={e=>setForm({...form,description:e.target.value})} />
+        <label className="form-label">Descripción</label>
+      </div>
+
       <div style={{display:'flex',gap:8}}>
         <button className="btn" type="submit">Guardar</button>
-        <button type="button" onClick={onCancel}>Cancelar</button>
+        <button type="button" className="btn-secondary" onClick={onCancel}>Cancelar</button>
       </div>
     </form>
   )

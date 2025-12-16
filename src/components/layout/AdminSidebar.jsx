@@ -2,14 +2,25 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 
 export default function AdminSidebar(){
+  const items = [
+    {to:'/admin',label:'Dashboard',icon:'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z'},
+    {to:'/admin/products',label:'Productos',icon:'M3 3h18v2H3V3zm0 4h18v2H3V7zm0 4h18v2H3v-2z'},
+    {to:'/admin/inventory',label:'Inventario',icon:'M3 13h2v-2H3v2zm0 4h2v-2H3v2zM7 9h14v10H7V9zM5 11h2V9H5v2z'},
+    {to:'/admin/config',label:'Configuración',icon:'M12 8a4 4 0 100 8 4 4 0 000-8z'}
+  ]
+
   return (
-    <aside style={{width:220,padding:16,background:'linear-gradient(180deg, rgba(255,255,255,0.02), transparent)',borderRight:'1px solid rgba(255,255,255,0.03)',height:'100vh'}}>
-      <div style={{fontWeight:700,marginBottom:12,color:'white'}}>Panel Admin</div>
+    <aside className="admin-sidebar" style={{width:260,height:'100vh'}}>
+      <div style={{fontWeight:800,marginBottom:14,color:'white',fontSize:18}}>Vidriería Valladares</div>
       <nav style={{display:'flex',flexDirection:'column',gap:8}}>
-        <NavLink to="/admin" end style={({isActive})=>({color:isActive?'var(--primary)':'var(--muted)'})}>Dashboard</NavLink>
-        <NavLink to="/admin/products" style={({isActive})=>({color:isActive?'var(--primary)':'var(--muted)'})}>Productos</NavLink>
-        <NavLink to="/admin/inventory" style={({isActive})=>({color:isActive?'var(--primary)':'var(--muted)'})}>Inventario</NavLink>
-        <NavLink to="/admin/config" style={({isActive})=>({color:isActive?'var(--primary)':'var(--muted)'})}>Configuración</NavLink>
+        {items.map(i=> (
+          <NavLink key={i.to} to={i.to} end={i.to==='/admin'} className={({isActive})=> `sidebar-item ${isActive? 'active':''}`}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{opacity:0.95}}>
+              <path d={i.icon}></path>
+            </svg>
+            <span style={{fontWeight:600}}>{i.label}</span>
+          </NavLink>
+        ))}
       </nav>
     </aside>
   )

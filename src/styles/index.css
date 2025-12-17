@@ -24,9 +24,63 @@ body,
 body {
   margin: 0;
   font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-  background: linear-gradient(180deg, var(--bg), #071223 60%);
+  position: relative;
   color: #e6eef7;
   -webkit-font-smoothing: antialiased;
+  /* Gradiente base mejorado con múltiples capas */
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(255, 106, 0, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(255, 148, 77, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(15, 23, 32, 0.8) 0%, transparent 100%),
+    linear-gradient(135deg, #0b0f14 0%, #071223 40%, #0a1929 80%, #0d1f35 100%);
+  background-attachment: fixed;
+}
+
+/* Patrón de puntos sutil para textura */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Efecto de luz radial animado */
+body::after {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255, 106, 0, 0.12) 0%, transparent 40%),
+    radial-gradient(ellipse at 70% 80%, rgba(255, 148, 77, 0.08) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+  animation: backgroundFloat 20s ease-in-out infinite alternate;
+}
+
+@keyframes backgroundFloat {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(3%, 3%) rotate(1deg);
+  }
+}
+
+/* Asegurar que el contenido esté por encima del fondo */
+#root {
+  position: relative;
+  z-index: 2;
 }
 
 .container {

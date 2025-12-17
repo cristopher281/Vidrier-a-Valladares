@@ -21,7 +21,7 @@ export default function FeaturedProducts() {
 
   return (
     <>
-      <section className="container" style={{ padding: '2rem 0' }}>
+      <section className="container" style={{ padding: '2rem 1rem' }}>
         <h2>Productos Destacados</h2>
         <div className="grid" style={{ marginTop: 12 }}>
           {allFeatured.map(p => (
@@ -41,42 +41,25 @@ export default function FeaturedProducts() {
                 alt={p.name}
               />
 
-              {/* Badge de tipo de producto */}
+              {/* Badge de tipo de producto - SIN EMOJI */}
               <div style={{
                 position: 'absolute',
                 top: '12px',
                 left: '12px',
-                padding: '4px 10px',
+                padding: '5px 12px',
                 borderRadius: '6px',
                 background: p.productType === 'wood'
-                  ? 'linear-gradient(135deg, rgba(139, 90, 60, 0.9), rgba(212, 165, 116, 0.8))'
-                  : 'linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(99, 179, 237, 0.8))',
+                  ? 'linear-gradient(135deg, rgba(139, 90, 60, 0.95), rgba(160, 110, 80, 0.95))'
+                  : 'linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(99, 179, 237, 0.95))',
                 color: 'white',
-                fontSize: '11px',
-                fontWeight: '700',
+                fontSize: '12px',
+                fontWeight: '600',
+                letterSpacing: '0.3px',
                 backdropFilter: 'blur(8px)',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
                 zIndex: 1
               }}>
-                {p.productType === 'wood' ? '🪵 Madera' : '🪟 Vidrio'}
-              </div>
-
-              {/* Badge destacado */}
-              <div style={{
-                position: 'absolute',
-                top: '12px',
-                right: '12px',
-                padding: '4px 8px',
-                borderRadius: '6px',
-                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                color: 'white',
-                fontSize: '11px',
-                fontWeight: '700',
-                backdropFilter: 'blur(8px)',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-                zIndex: 1
-              }}>
-                ⭐ Destacado
+                {p.productType === 'wood' ? 'Madera' : 'Vidrio'}
               </div>
 
               <div style={{ marginTop: '8px' }}>

@@ -213,6 +213,14 @@ h2 {
   .hero {
     flex-direction: column
   }
+
+  .container {
+    padding: 1rem 1.25rem;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
 }
 
 /* Enhanced design tokens and utilities */
@@ -540,7 +548,7 @@ h2 {
 
 .wood-card:hover {
   transform: translateY(-8px);
-  box-shadow: 
+  box-shadow:
     0 16px 40px rgba(2, 6, 23, 0.7),
     0 0 0 1px rgba(212, 165, 116, 0.2);
   border-color: rgba(212, 165, 116, 0.3);
@@ -591,6 +599,7 @@ h2 {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

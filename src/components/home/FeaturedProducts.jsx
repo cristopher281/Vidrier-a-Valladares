@@ -25,7 +25,16 @@ export default function FeaturedProducts() {
         <h2>Productos Destacados</h2>
         <div className="grid" style={{ marginTop: 12 }}>
           {allFeatured.map(p => (
-            <div key={p.id} className="card" style={{ cursor: 'pointer' }} onClick={() => setSelectedProduct(p)}>
+            <div
+              key={p.id}
+              className="card"
+              style={{
+                cursor: 'pointer',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              onClick={() => setSelectedProduct(p)}
+            >
               <img
                 className="product-img"
                 src={p.img || 'https://via.placeholder.com/400x300?text=Producto'}
@@ -46,7 +55,8 @@ export default function FeaturedProducts() {
                 fontSize: '11px',
                 fontWeight: '700',
                 backdropFilter: 'blur(8px)',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                zIndex: 1
               }}>
                 {p.productType === 'wood' ? '🪵 Madera' : '🪟 Vidrio'}
               </div>
@@ -63,7 +73,8 @@ export default function FeaturedProducts() {
                 fontSize: '11px',
                 fontWeight: '700',
                 backdropFilter: 'blur(8px)',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                zIndex: 1
               }}>
                 ⭐ Destacado
               </div>

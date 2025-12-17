@@ -231,6 +231,131 @@ h2 {
   .btn {
     font-size: 14px;
   }
+
+  /* Admin Layout Mobile */
+  .admin-layout {
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    padding: 1rem;
+    border-radius: 0;
+  }
+
+  .admin-main {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  /* Form Sections Mobile */
+  .form-section {
+    padding: 1rem;
+  }
+
+  .form-section-title {
+    font-size: 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Inventory Grid Mobile */
+  .inventory-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+
+  .inventory-card {
+    padding: 1rem;
+  }
+
+  /* Tab Navigation Mobile */
+  .tab-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab-button {
+    font-size: 14px;
+    padding: 10px 16px;
+    white-space: nowrap;
+  }
+
+  /* Dashboard Metrics Mobile */
+  .metrics-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .metric-card {
+    padding: 1rem;
+  }
+
+  /* Drag Drop Area Mobile */
+  .drag-drop-area {
+    padding: 1.5rem 1rem;
+  }
+
+  .drag-drop-text {
+    font-size: 13px;
+  }
+
+  /* Image Preview Mobile */
+  .image-preview-wrap {
+    max-width: 100%;
+  }
+
+  .image-preview {
+    max-height: 250px;
+  }
+
+  /* Action Buttons Mobile */
+  .inventory-actions {
+    gap: 8px;
+  }
+
+  .action-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* Search and Filters Mobile */
+  .table-controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .filter-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* Admin Header Mobile */
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .admin-header h1 {
+    font-size: 24px;
+  }
+
+  .admin-actions {
+    width: 100%;
+  }
+
+  .admin-actions button {
+    width: 100%;
+  }
 }
 
 /* Enhanced design tokens and utilities */

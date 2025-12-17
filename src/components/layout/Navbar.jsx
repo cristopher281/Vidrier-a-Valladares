@@ -71,6 +71,17 @@ export default function Navbar() {
       <nav className="nav-links">
         <Link to="/" onClick={handleLinkClick}>Inicio</Link>
         <Link to="/catalog" onClick={handleLinkClick}>Productos</Link>
+        <Link to="/wood-products" onClick={handleLinkClick} style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px'
+        }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 2L4 7v9c0 5.1 3.4 9.8 8 11 4.6-1.2 8-5.9 8-11V7l-8-5z" />
+            <path d="M12 8v8M8 12h8" />
+          </svg>
+          Carpintería
+        </Link>
         <Link to="/about" onClick={handleLinkClick}>Nosotros</Link>
         <Link to="/contact" onClick={handleLinkClick}>Contacto</Link>
         <button

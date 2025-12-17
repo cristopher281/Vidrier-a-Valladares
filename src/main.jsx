@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { ProductProvider } from './context/ProductContext'
 import { RawMaterialsProvider } from './context/RawMaterialsContext'
+import { WoodProductProvider } from './context/WoodProductContext'
 import './styles/index.css'
 import './styles/responsive.css'
 
@@ -12,7 +13,9 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <ProductProvider>
         <RawMaterialsProvider>
-          <App />
+          <WoodProductProvider>
+            <App />
+          </WoodProductProvider>
         </RawMaterialsProvider>
       </ProductProvider>
     </BrowserRouter>

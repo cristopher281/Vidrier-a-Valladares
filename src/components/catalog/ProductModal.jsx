@@ -28,7 +28,13 @@ export default function ProductModal({ product, onClose }) {
                     </div>
 
                     <div className="modal-details">
-                        <h2>{product.name}</h2>
+                        <h2 style={{
+                            color: 'white',
+                            fontSize: '28px',
+                            fontWeight: '700',
+                            marginBottom: '12px',
+                            textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+                        }}>{product.name}</h2>
 
                         <div className="modal-category">
                             <span className="category-badge">{product.category}</span>
@@ -57,15 +63,6 @@ export default function ProductModal({ product, onClose }) {
                                     {product.stock > 0 ? `${product.stock} en stock` : 'Agotado'}
                                 </span>
                             </div>
-                        </div>
-
-                        <div className="modal-actions">
-                            <Link to="/presupuesto" className="btn btn-primary">
-                                Obtener Presupuesto
-                            </Link>
-                            <button className="btn btn-secondary" onClick={onClose}>
-                                Cerrar
-                            </button>
                         </div>
                     </div>
                 </div>

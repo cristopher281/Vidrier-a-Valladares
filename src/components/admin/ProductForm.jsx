@@ -145,6 +145,23 @@ export default function ProductForm({ initial, onSave, onCancel }) {
             rows="4"
           />
         </div>
+
+        <div className="form-group">
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={form.featured || false}
+              onChange={e => setForm({ ...form, featured: e.target.checked })}
+              style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+            />
+            <span className="form-label" style={{ margin: 0 }}>
+              ⭐ Marcar como Producto Destacado
+            </span>
+          </label>
+          <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '4px', marginLeft: '26px' }}>
+            Los productos destacados aparecen en la página principal
+          </div>
+        </div>
       </div>
 
       <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>

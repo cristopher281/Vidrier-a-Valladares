@@ -123,6 +123,25 @@ export default function InventoryTable() {
                       alt={p.name}
                       className="inventory-thumb"
                     />
+                    {p.featured && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
+                        background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                        color: 'white',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        fontSize: '11px',
+                        fontWeight: '700',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+                      }}>
+                        ⭐ Destacado
+                      </div>
+                    )}
                   </div>
 
                   <div className="inventory-info">

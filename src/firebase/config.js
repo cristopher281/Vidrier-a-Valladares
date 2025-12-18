@@ -24,24 +24,24 @@ let firebaseConfig = {
 // exclude it via .gitignore.
 // Note: Dynamic import with string template to prevent Vite from resolving at build time
 if (import.meta.env.DEV) {
-  try {
-    // Only attempt to load local credentials in development mode
-    const credsModule = await import(/* @vite-ignore */ './credentials/credentials.js')
-    const local = credsModule.firebaseCredentials || credsModule.default
-    if (local && Object.keys(local).length) {
-      firebaseConfig = {
-        apiKey: local.apiKey || firebaseConfig.apiKey,
-        authDomain: local.authDomain || firebaseConfig.authDomain,
-        projectId: local.projectId || firebaseConfig.projectId,
-        storageBucket: local.storageBucket || firebaseConfig.storageBucket,
-        messagingSenderId: local.messagingSenderId || firebaseConfig.messagingSenderId,
-        appId: local.appId || firebaseConfig.appId,
-        measurementId: local.measurementId || firebaseConfig.measurementId
+  import(/* @vite-ignore */ './credentials/credentials.js')
+    .then((credsModule) => {
+      const local = credsModule.firebaseCredentials || credsModule.default
+      if (local && Object.keys(local).length) {
+        firebaseConfig = {
+          apiKey: local.apiKey || firebaseConfig.apiKey,
+          authDomain: local.authDomain || firebaseConfig.authDomain,
+          projectId: local.projectId || firebaseConfig.projectId,
+          storageBucket: local.storageBucket || firebaseConfig.storageBucket,
+          messagingSenderId: local.messagingSenderId || firebaseConfig.messagingSenderId,
+          appId: local.appId || firebaseConfig.appId,
+          measurementId: local.measurementId || firebaseConfig.measurementId
+        }
       }
-    }
-  } catch (e) {
-    // no local credentials found in dev — continue with env/fallback
-  }
+    })
+    .catch(() => {
+      // no local credentials found — continue with env/fallback
+    })
 }
 // In production, always use env vars or fallback values
 

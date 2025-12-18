@@ -2,11 +2,12 @@ import React, { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 
 export default function LoginForm({ onSwitchToPhone, onSwitchToForgot }) {
-    const { loginWithEmail, error } = useAuth()
+    const { loginWithEmail, register, error } = useAuth()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [localError, setLocalError] = useState('')
     const [loading, setLoading] = useState(false)
+    const [isRegistering, setIsRegistering] = useState(false)
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -25,7 +26,16 @@ export default function LoginForm({ onSwitchToPhone, onSwitchToForgot }) {
 
         try {
             setLoading(true)
-            await loginWithEmail(email, password)
+            if (isRegistering) {
+                // Registrar nuevo usuario
+                await register(email, password)
+                setLocalError('')
+                // Después de registrar, automáticamente intenta login
+                await loginWithEmail(email, password)
+            } else {
+                // Login normal
+                await loginWithEmail(email, password)
+            }
             // El redirect lo manejará automáticamente el AuthContext
         } catch (err) {
             setLocalError(err.message)
@@ -44,6 +54,44 @@ export default function LoginForm({ onSwitchToPhone, onSwitchToForgot }) {
                 </div>
                 <h3>Administración</h3>
                 <p className="subtitle">Vidriería Valladares</p>
+
+                {/* Toggle entre Login y Registro */}
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                    <button
+                        type="button"
+                        onClick={() => setIsRegistering(false)}
+                        style={{
+                            flex: 1,
+                            padding: '8px 12px',
+                            background: !isRegistering ? 'linear-gradient(90deg, var(--primary), var(--accent))' : 'transparent',
+                            border: !isRegistering ? 'none' : '1px solid rgba(255,255,255,0.1)',
+                            color: 'white',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontWeight: isRegistering ? 'normal' : 'bold'
+                        }}
+                    >
+                        Iniciar Sesión
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setIsRegistering(true)}
+                        style={{
+                            flex: 1,
+                            padding: '8px 12px',
+                            background: isRegistering ? 'linear-gradient(90deg, var(--primary), var(--accent))' : 'transparent',
+                            border: isRegistering ? 'none' : '1px solid rgba(255,255,255,0.1)',
+                            color: 'white',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontWeight: !isRegistering ? 'normal' : 'bold'
+                        }}
+                    >
+                        Registrar
+                    </button>
+                </div>
 
                 <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 16 }}>
                     <div className="form-group">
@@ -69,6 +117,11 @@ export default function LoginForm({ onSwitchToPhone, onSwitchToForgot }) {
                             onChange={(e) => setPassword(e.target.value)}
                             disabled={loading}
                         />
+                        {isRegistering && (
+                            <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '4px' }}>
+                                Mínimo 6 caracteres
+                            </div>
+                        )}
                     </div>
 
                     {(localError || error) && (
@@ -82,25 +135,27 @@ export default function LoginForm({ onSwitchToPhone, onSwitchToForgot }) {
                         type="submit"
                         disabled={loading}
                     >
-                        {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                        {loading ? (isRegistering ? 'Creando cuenta...' : 'Iniciando sesión...') : (isRegistering ? 'Crear Cuenta' : 'Iniciar Sesión')}
                     </button>
 
-                    <div style={{ textAlign: 'center', fontSize: 14, color: 'var(--muted)' }}>
-                        <button
-                            type="button"
-                            onClick={onSwitchToForgot}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                color: 'var(--primary)',
-                                cursor: 'pointer',
-                                textDecoration: 'underline',
-                                padding: 0
-                            }}
-                        >
-                            ¿Olvidaste tu contraseña?
-                        </button>
-                    </div>
+                    {!isRegistering && (
+                        <div style={{ textAlign: 'center', fontSize: 14, color: 'var(--muted)' }}>
+                            <button
+                                type="button"
+                                onClick={onSwitchToForgot}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: 'var(--primary)',
+                                    cursor: 'pointer',
+                                    textDecoration: 'underline',
+                                    padding: 0
+                                }}
+                            >
+                                ¿Olvidaste tu contraseña?
+                            </button>
+                        </div>
+                    )}
 
                     <div style={{
                         borderTop: '1px solid rgba(255,255,255,0.1)',

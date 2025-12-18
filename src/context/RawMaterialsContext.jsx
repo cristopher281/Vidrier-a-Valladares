@@ -1,12 +1,12 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { loadFromStorage, saveToStorage } from '../utils/storage'
+import { subscribeToCollection, addDocument, updateDocument, deleteDocument } from '../firebase/firestore'
+import { migrateToFirestore } from '../utils/migrateToFirestore'
 
 const RawMaterialsContext = createContext()
 
 const SAMPLE = [
     {
-        id: 'm1',
         name: 'Vidrio templado 6mm',
         category: 'Vidrio',
         quantity: 50,
@@ -15,7 +15,6 @@ const SAMPLE = [
         description: 'Láminas de vidrio templado transparente de 6mm'
     },
     {
-        id: 'm2',
         name: 'Aluminio natural',
         category: 'Aluminio',
         quantity: 150,
@@ -24,7 +23,6 @@ const SAMPLE = [
         description: 'Perfil de aluminio natural para marcos'
     },
     {
-        id: 'm3',
         name: 'Vidrio laminado 10mm',
         category: 'Vidrio',
         quantity: 8,
@@ -33,7 +31,6 @@ const SAMPLE = [
         description: 'Láminas de vidrio laminado de seguridad'
     },
     {
-        id: 'm4',
         name: 'Aluminio negro',
         category: 'Aluminio',
         quantity: 80,
@@ -42,7 +39,6 @@ const SAMPLE = [
         description: 'Perfil de aluminio acabado negro'
     },
     {
-        id: 'm5',
         name: 'Vidrio espejo 4mm',
         category: 'Vidrio',
         quantity: 15,
@@ -51,7 +47,6 @@ const SAMPLE = [
         description: 'Láminas de vidrio espejo de 4mm'
     },
     {
-        id: 'm6',
         name: 'Silicón para vidrio',
         category: 'Accesorios',
         quantity: 25,
@@ -62,25 +57,64 @@ const SAMPLE = [
 ]
 
 export function RawMaterialsProvider({ children }) {
-    const [materials, setMaterials] = useState(() => {
-        return loadFromStorage('vv_raw_materials', SAMPLE)
-    })
+    const [materials, setMaterials] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
 
     useEffect(() => {
-        saveToStorage('vv_raw_materials', materials)
-    }, [materials])
+        let unsubscribe = null
 
-    const addMaterial = (m) => {
-        const item = { ...m, id: m.id || ('m' + Date.now()) }
-        setMaterials(prev => [item, ...prev])
+        const initializeMaterials = async () => {
+            try {
+                // Intentar migrar datos de localStorage a Firestore
+                await migrateToFirestore('rawMaterials', 'vv_raw_materials', SAMPLE)
+
+                // Suscribirse a cambios en tiempo real
+                unsubscribe = subscribeToCollection('rawMaterials', (data) => {
+                    setMaterials(data)
+                    setLoading(false)
+                })
+            } catch (err) {
+                console.error('Error initializing raw materials:', err)
+                setError(err.message)
+                setLoading(false)
+            }
+        }
+
+        initializeMaterials()
+
+        // Cleanup: desuscribirse cuando el componente se desmonte
+        return () => {
+            if (unsubscribe) unsubscribe()
+        }
+    }, [])
+
+    const addMaterial = async (m) => {
+        try {
+            const { id, ...materialData } = m
+            await addDocument('rawMaterials', materialData)
+        } catch (err) {
+            console.error('Error adding material:', err)
+            throw err
+        }
     }
 
-    const updateMaterial = (id, patch) => {
-        setMaterials(prev => prev.map(it => it.id === id ? { ...it, ...patch } : it))
+    const updateMaterial = async (id, patch) => {
+        try {
+            await updateDocument('rawMaterials', id, patch)
+        } catch (err) {
+            console.error('Error updating material:', err)
+            throw err
+        }
     }
 
-    const deleteMaterial = (id) => {
-        setMaterials(prev => prev.filter(it => it.id !== id))
+    const deleteMaterial = async (id) => {
+        try {
+            await deleteDocument('rawMaterials', id)
+        } catch (err) {
+            console.error('Error deleting material:', err)
+            throw err
+        }
     }
 
     const search = (q) => {
@@ -96,7 +130,16 @@ export function RawMaterialsProvider({ children }) {
     const lowStock = materials.filter(m => m.quantity < (m.minStock || 0))
 
     return (
-        <RawMaterialsContext.Provider value={{ materials, addMaterial, updateMaterial, deleteMaterial, search, lowStock }}>
+        <RawMaterialsContext.Provider value={{
+            materials,
+            addMaterial,
+            updateMaterial,
+            deleteMaterial,
+            search,
+            lowStock,
+            loading,
+            error
+        }}>
             {children}
         </RawMaterialsContext.Provider>
     )

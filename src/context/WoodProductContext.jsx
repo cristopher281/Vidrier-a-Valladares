@@ -1,12 +1,12 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { loadFromStorage, saveToStorage } from '../utils/storage'
+import { subscribeToCollection, addDocument, updateDocument, deleteDocument } from '../firebase/firestore'
+import { migrateToFirestore } from '../utils/migrateToFirestore'
 
 const WoodProductContext = createContext()
 
 const SAMPLE_WOOD_PRODUCTS = [
     {
-        id: 'w1',
         name: 'Puerta Principal de Caoba',
         category: 'Puertas',
         price: 4500,
@@ -16,7 +16,6 @@ const SAMPLE_WOOD_PRODUCTS = [
         featured: false
     },
     {
-        id: 'w2',
         name: 'Ventana de Madera Doble Hoja',
         category: 'Ventanas',
         price: 2800,
@@ -26,7 +25,6 @@ const SAMPLE_WOOD_PRODUCTS = [
         featured: true
     },
     {
-        id: 'w3',
         name: 'Escritorio Ejecutivo',
         category: 'Escritorios',
         price: 6200,
@@ -36,7 +34,6 @@ const SAMPLE_WOOD_PRODUCTS = [
         featured: true
     },
     {
-        id: 'w4',
         name: 'Librero Modular',
         category: 'Muebles',
         price: 3800,
@@ -46,7 +43,6 @@ const SAMPLE_WOOD_PRODUCTS = [
         featured: false
     },
     {
-        id: 'w5',
         name: 'Puerta Interior Minimalista',
         category: 'Puertas',
         price: 2200,
@@ -56,7 +52,6 @@ const SAMPLE_WOOD_PRODUCTS = [
         featured: false
     },
     {
-        id: 'w6',
         name: 'Mesa de Juntas Personalizada',
         category: 'A Medida',
         price: 12000,
@@ -66,7 +61,6 @@ const SAMPLE_WOOD_PRODUCTS = [
         featured: false
     },
     {
-        id: 'w7',
         name: 'Ventana Tipo Guillotina',
         category: 'Ventanas',
         price: 3200,
@@ -76,7 +70,6 @@ const SAMPLE_WOOD_PRODUCTS = [
         featured: false
     },
     {
-        id: 'w8',
         name: 'Closet Empotrado',
         category: 'Muebles',
         price: 8500,
@@ -88,36 +81,64 @@ const SAMPLE_WOOD_PRODUCTS = [
 ]
 
 export function WoodProductProvider({ children }) {
-    const [woodProducts, setWoodProducts] = useState(() => {
-        const stored = loadFromStorage('vv_wood_products', SAMPLE_WOOD_PRODUCTS)
-
-        // Actualizar productos que tienen imágenes vacías con las imágenes de SAMPLE
-        const updated = stored.map(product => {
-            const sampleProduct = SAMPLE_WOOD_PRODUCTS.find(s => s.id === product.id)
-            if (sampleProduct && (!product.img || product.img === '')) {
-                return { ...product, img: sampleProduct.img }
-            }
-            return product
-        })
-
-        return updated
-    })
+    const [woodProducts, setWoodProducts] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
 
     useEffect(() => {
-        saveToStorage('vv_wood_products', woodProducts)
-    }, [woodProducts])
+        let unsubscribe = null
 
-    const addWoodProduct = (p) => {
-        const item = { ...p, id: p.id || ('w' + Date.now()) }
-        setWoodProducts(prev => [item, ...prev])
+        const initializeWoodProducts = async () => {
+            try {
+                // Intentar migrar datos de localStorage a Firestore
+                await migrateToFirestore('woodProducts', 'vv_wood_products', SAMPLE_WOOD_PRODUCTS)
+
+                // Suscribirse a cambios en tiempo real
+                unsubscribe = subscribeToCollection('woodProducts', (data) => {
+                    setWoodProducts(data)
+                    setLoading(false)
+                })
+            } catch (err) {
+                console.error('Error initializing wood products:', err)
+                setError(err.message)
+                setLoading(false)
+            }
+        }
+
+        initializeWoodProducts()
+
+        // Cleanup: desuscribirse cuando el componente se desmonte
+        return () => {
+            if (unsubscribe) unsubscribe()
+        }
+    }, [])
+
+    const addWoodProduct = async (p) => {
+        try {
+            const { id, ...productData } = p
+            await addDocument('woodProducts', productData)
+        } catch (err) {
+            console.error('Error adding wood product:', err)
+            throw err
+        }
     }
 
-    const updateWoodProduct = (id, patch) => {
-        setWoodProducts(prev => prev.map(it => it.id === id ? { ...it, ...patch } : it))
+    const updateWoodProduct = async (id, patch) => {
+        try {
+            await updateDocument('woodProducts', id, patch)
+        } catch (err) {
+            console.error('Error updating wood product:', err)
+            throw err
+        }
     }
 
-    const deleteWoodProduct = (id) => {
-        setWoodProducts(prev => prev.filter(it => it.id !== id))
+    const deleteWoodProduct = async (id) => {
+        try {
+            await deleteDocument('woodProducts', id)
+        } catch (err) {
+            console.error('Error deleting wood product:', err)
+            throw err
+        }
     }
 
     const searchWoodProducts = (q) => {
@@ -128,8 +149,16 @@ export function WoodProductProvider({ children }) {
 
     const lowStockWood = woodProducts.filter(p => p.stock < 10)
 
-    const toggleFeaturedWood = (id) => {
-        setWoodProducts(prev => prev.map(p => p.id === id ? { ...p, featured: !p.featured } : p))
+    const toggleFeaturedWood = async (id) => {
+        try {
+            const product = woodProducts.find(p => p.id === id)
+            if (product) {
+                await updateDocument('woodProducts', id, { featured: !product.featured })
+            }
+        } catch (err) {
+            console.error('Error toggling featured wood product:', err)
+            throw err
+        }
     }
 
     const getFeaturedWoodProducts = () => {
@@ -137,7 +166,18 @@ export function WoodProductProvider({ children }) {
     }
 
     return (
-        <WoodProductContext.Provider value={{ woodProducts, addWoodProduct, updateWoodProduct, deleteWoodProduct, searchWoodProducts, lowStockWood, toggleFeaturedWood, getFeaturedWoodProducts }}>
+        <WoodProductContext.Provider value={{
+            woodProducts,
+            addWoodProduct,
+            updateWoodProduct,
+            deleteWoodProduct,
+            searchWoodProducts,
+            lowStockWood,
+            toggleFeaturedWood,
+            getFeaturedWoodProducts,
+            loading,
+            error
+        }}>
             {children}
         </WoodProductContext.Provider>
     )

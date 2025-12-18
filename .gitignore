@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local firebase credentials (do not commit)
+src/firebase/credentials/credentials.js

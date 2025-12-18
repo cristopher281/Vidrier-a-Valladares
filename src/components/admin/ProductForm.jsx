@@ -3,6 +3,7 @@ import { fileToBase64, compressImage } from '../../utils/storage'
 
 export default function ProductForm({ initial, onSave, onCancel }) {
   const [form, setForm] = useState({ name: '', price: 0, stock: 0, category: 'Vidrio templado', description: '', img: '' })
+  const [selectedFile, setSelectedFile] = useState(null)
   const [dragOver, setDragOver] = useState(false)
   const fileInputRef = useRef()
 
@@ -12,7 +13,10 @@ export default function ProductForm({ initial, onSave, onCancel }) {
     if (!f) return
     const b = await fileToBase64(f)
     const compressed = await compressImage(b, 800)
+    // preview image as compressed data url
     setForm(prev => ({ ...prev, img: compressed }))
+    // also keep original file reference for upload if needed
+    setSelectedFile(f)
   }
 
   const handleFile = async (e) => {
@@ -29,11 +33,29 @@ export default function ProductForm({ initial, onSave, onCancel }) {
 
   const removeImage = () => {
     setForm(prev => ({ ...prev, img: '' }))
+    setSelectedFile(null)
   }
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
-    const payload = { ...form, price: Number(form.price || 0), stock: Number(form.stock || 0) }
+    let imgUrl = form.img
+
+    // If img is a data URL (compressed preview), upload it to Firebase Storage
+    try {
+      if (form.img && form.img.startsWith('data:')) {
+        // dynamic import of storage helper to avoid loading storage in non-Firebase envs
+        const { uploadBase64 } = await import('../../firebase/storage')
+        const timestamp = Date.now()
+        const ext = form.img.split(';')[0].split('/')[1] || 'jpg'
+        const safeName = (form.name || 'product').replace(/[^a-z0-9-_]/gi, '_').toLowerCase()
+        const path = `products/${safeName}_${timestamp}.${ext}`
+        imgUrl = await uploadBase64(form.img, path)
+      }
+    } catch (err) {
+      console.error('Error uploading image:', err)
+    }
+
+    const payload = { ...form, img: imgUrl, price: Number(form.price || 0), stock: Number(form.stock || 0) }
     onSave(payload)
   }
 

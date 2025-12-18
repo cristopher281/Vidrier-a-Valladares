@@ -63,12 +63,15 @@ export default function ProductForm({ initial, onSave, onCancel }) {
     <form onSubmit={submit}>
       <div className="form-section">
         <div className="form-section-title">Imagen del Producto</div>
+
+        {/* Desktop: Drag & Drop Area */}
         <div
           className={`drag-drop-area ${dragOver ? 'drag-over' : ''}`}
           onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
           onDragLeave={() => setDragOver(false)}
           onDrop={onDrop}
           onClick={() => fileInputRef.current && fileInputRef.current.click()}
+          style={{ display: 'none' }}
         >
           <div className="drag-drop-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -86,6 +89,34 @@ export default function ProductForm({ initial, onSave, onCancel }) {
             onChange={handleFile}
             style={{ display: 'none' }}
           />
+        </div>
+
+        {/* Mobile & Desktop: Upload Buttons */}
+        <div style={{ display: 'grid', gap: '12px' }}>
+          {!form.img && (
+            <>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+                </svg>
+                Seleccionar desde galería
+              </button>
+
+              {/* Hidden file inputs */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFile}
+                style={{ display: 'none' }}
+              />
+            </>
+          )}
         </div>
 
         {form.img && (

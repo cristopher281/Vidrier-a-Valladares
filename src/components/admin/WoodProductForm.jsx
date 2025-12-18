@@ -80,23 +80,51 @@ export default function WoodProductForm({ initial, onSave, onCancel }) {
                         </div>
                     </div>
                 ) : (
-                    // Modo subir archivo
-                    <div
-                        className={`drag-drop-area ${dragOver ? 'drag-over' : ''}`}
-                        onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
-                        onDragLeave={() => setDragOver(false)}
-                        onDrop={onDrop}
-                        onClick={() => fileInputRef.current && fileInputRef.current.click()}
-                    >
-                        <div className="drag-drop-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                            </svg>
+                    // Modo subir archivo - Mobile friendly
+                    <>
+                        {/* Hidden drag-drop area for desktop compatibility */}
+                        <div
+                            className={`drag-drop-area ${dragOver ? 'drag-over' : ''}`}
+                            onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                            onDragLeave={() => setDragOver(false)}
+                            onDrop={onDrop}
+                            onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                            style={{ display: 'none' }}
+                        >
+                            <div className="drag-drop-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                                </svg>
+                            </div>
+                            <div className="drag-drop-text">
+                                <strong>{form.img ? 'Cambiar imagen' : 'Subir imagen'}</strong>
+                                Arrastra una imagen aquí o haz clic para seleccionar
+                            </div>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFile}
+                                style={{ display: 'none' }}
+                            />
                         </div>
-                        <div className="drag-drop-text">
-                            <strong>{form.img ? 'Cambiar imagen' : 'Subir imagen'}</strong>
-                            Arrastra una imagen aquí o haz clic para seleccionar
-                        </div>
+
+                        {/* Mobile & Desktop: Upload Button */}
+                        {!form.img && (
+                            <button
+                                type="button"
+                                className="btn"
+                                onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+                                </svg>
+                                Seleccionar imagen
+                            </button>
+                        )}
+
+                        {/* Hidden file input */}
                         <input
                             ref={fileInputRef}
                             type="file"
@@ -104,7 +132,7 @@ export default function WoodProductForm({ initial, onSave, onCancel }) {
                             onChange={handleFile}
                             style={{ display: 'none' }}
                         />
-                    </div>
+                    </>
                 )}
 
                 {form.img && (

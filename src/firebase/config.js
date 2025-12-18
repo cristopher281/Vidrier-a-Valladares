@@ -21,25 +21,29 @@ let firebaseConfig = {
 
 // If a local credentials file exists, prefer its values. This allows developers to
 // keep a local-only `src/firebase/credentials/credentials.js` with real keys and
-// exclude it via .gitignore. We use top-level await so Vite can bundle this.
-try {
-  // dynamic import — will fail silently if file doesn't exist
-  const credsModule = await import('./credentials/credentials.js')
-  const local = credsModule.firebaseCredentials || credsModule.default
-  if (local && Object.keys(local).length) {
-    firebaseConfig = {
-      apiKey: local.apiKey || firebaseConfig.apiKey,
-      authDomain: local.authDomain || firebaseConfig.authDomain,
-      projectId: local.projectId || firebaseConfig.projectId,
-      storageBucket: local.storageBucket || firebaseConfig.storageBucket,
-      messagingSenderId: local.messagingSenderId || firebaseConfig.messagingSenderId,
-      appId: local.appId || firebaseConfig.appId,
-      measurementId: local.measurementId || firebaseConfig.measurementId
+// exclude it via .gitignore.
+// Note: Dynamic import with string template to prevent Vite from resolving at build time
+if (import.meta.env.DEV) {
+  try {
+    // Only attempt to load local credentials in development mode
+    const credsModule = await import(/* @vite-ignore */ './credentials/credentials.js')
+    const local = credsModule.firebaseCredentials || credsModule.default
+    if (local && Object.keys(local).length) {
+      firebaseConfig = {
+        apiKey: local.apiKey || firebaseConfig.apiKey,
+        authDomain: local.authDomain || firebaseConfig.authDomain,
+        projectId: local.projectId || firebaseConfig.projectId,
+        storageBucket: local.storageBucket || firebaseConfig.storageBucket,
+        messagingSenderId: local.messagingSenderId || firebaseConfig.messagingSenderId,
+        appId: local.appId || firebaseConfig.appId,
+        measurementId: local.measurementId || firebaseConfig.measurementId
+      }
     }
+  } catch (e) {
+    // no local credentials found in dev — continue with env/fallback
   }
-} catch (e) {
-  // no local credentials found — continue with env/fallback
 }
+// In production, always use env vars or fallback values
 
 // Initialize Firebase app
 const app = initializeApp(firebaseConfig)

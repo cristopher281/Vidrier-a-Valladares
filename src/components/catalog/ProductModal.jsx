@@ -21,7 +21,7 @@ export default function ProductModal({ product, onClose }) {
                 <div className="modal-body">
                     <div className="modal-image-container">
                         <img
-                            src={product.img ? encodeURI(product.img) : 'https://via.placeholder.com/600x400?text=Vidrio'}
+                            src={product.img ? product.img.split('/').map(part => encodeURIComponent(part)).join('/') : 'https://via.placeholder.com/600x400?text=Vidrio'}
                             alt={product.name}
                             className="modal-image"
                         />

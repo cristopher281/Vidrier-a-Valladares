@@ -3,7 +3,7 @@ import React from 'react'
 export default function WoodProductCard({ product, onDetailsClick }) {
     return (
         <div className="wood-card card">
-            <img className="product-img" src={product.img ? encodeURI(product.img) : 'https://images.unsplash.com/photo-1550581190-9c1c48d21d6c?q=80&w=800&auto=format&fit=crop'} alt={product.name} />
+            <img className="product-img" src={product.img ? product.img.split('/').map(part => encodeURIComponent(part)).join('/') : 'https://images.unsplash.com/photo-1550581190-9c1c48d21d6c?q=80&w=800&auto=format&fit=crop'} alt={product.name} />
 
             {/* Badge de categoría con tema de madera */}
             <div style={{

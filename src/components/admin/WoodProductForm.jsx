@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { fileToBase64, compressImage } from '../../utils/storage'
 
-export default function WoodProductForm({ initial, onSave, onCancel }) {
+export default function WoodProductForm({ initial, onSave, onCancel, imageReadOnly = false }) {
     const [form, setForm] = useState({ name: '', price: 0, stock: 0, category: 'Puertas', description: '', img: '', featured: false })
     const [dragOver, setDragOver] = useState(false)
     const [useUrl, setUseUrl] = useState(false)
@@ -42,64 +42,136 @@ export default function WoodProductForm({ initial, onSave, onCancel }) {
 
     return (
         <form onSubmit={submit}>
-            <div className="form-section">
-                <div className="form-section-title">Imagen del Producto</div>
-
-                {/* Toggle entre URL y subir archivo */}
-                <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-                    <button
-                        type="button"
-                        className={!useUrl ? 'btn' : 'btn-secondary'}
-                        onClick={() => setUseUrl(false)}
-                        style={{ padding: '8px 16px', fontSize: '14px' }}
-                    >
-                        📁 Subir desde Galería
-                    </button>
-                    <button
-                        type="button"
-                        className={useUrl ? 'btn' : 'btn-secondary'}
-                        onClick={() => setUseUrl(true)}
-                        style={{ padding: '8px 16px', fontSize: '14px' }}
-                    >
-                        🔗 Usar URL
-                    </button>
-                </div>
-
-                {useUrl ? (
-                    // Modo URL
-                    <div className="form-group">
-                        <label className="form-label">URL de la imagen</label>
-                        <input
-                            className="input"
-                            placeholder="https://images.unsplash.com/photo-..."
-                            value={form.img}
-                            onChange={e => setForm({ ...form, img: e.target.value })}
-                        />
-                        <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '6px' }}>
-                            💡 Usa enlaces de Unsplash u otros servicios de imágenes
+            {/* Sección de Imagen - Solo Lectura */}
+            {imageReadOnly ? (
+                <div className="form-section">
+                    <div className="form-section-title">Imagen del Producto (Hardcodeada)</div>
+                    <div style={{
+                        padding: '16px',
+                        background: 'rgba(59, 130, 246, 0.05)',
+                        border: '2px dashed rgba(59, 130, 246, 0.2)',
+                        borderRadius: '8px',
+                        textAlign: 'center'
+                    }}>
+                        {form.img && (
+                            <div style={{ marginBottom: '12px' }}>
+                                <img
+                                    src={form.img}
+                                    alt="preview"
+                                    style={{
+                                        maxWidth: '100%',
+                                        maxHeight: '200px',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                                    }}
+                                    onError={(e) => { e.target.style.display = 'none' }}
+                                />
+                            </div>
+                        )}
+                        <div style={{
+                            color: 'var(--muted)',
+                            fontSize: '13px',
+                            padding: '8px',
+                            background: 'rgba(255, 255, 255, 0.03)',
+                            borderRadius: '6px',
+                            fontFamily: 'monospace'
+                        }}>
+                            🔒 Ruta fija: <span style={{ color: '#60a5fa' }}>{form.img || 'Sin imagen'}</span>
+                        </div>
+                        <div style={{
+                            color: 'var(--muted)',
+                            fontSize: '12px',
+                            marginTop: '8px'
+                        }}>
+                            ℹ️ Las imágenes están guardadas en el código. No se pueden cambiar desde aquí.
                         </div>
                     </div>
-                ) : (
-                    // Modo subir archivo - Mobile friendly
-                    <>
-                        {/* Hidden drag-drop area for desktop compatibility */}
-                        <div
-                            className={`drag-drop-area ${dragOver ? 'drag-over' : ''}`}
-                            onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
-                            onDragLeave={() => setDragOver(false)}
-                            onDrop={onDrop}
-                            onClick={() => fileInputRef.current && fileInputRef.current.click()}
-                            style={{ display: 'none' }}
+                </div>
+            ) : (
+                // Modo normal con subida de imágenes (para futuro uso)
+                <div className="form-section">
+                    <div className="form-section-title">Imagen del Producto</div>
+
+                    {/* Toggle entre URL y subir archivo */}
+                    <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
+                        <button
+                            type="button"
+                            className={!useUrl ? 'btn' : 'btn-secondary'}
+                            onClick={() => setUseUrl(false)}
+                            style={{ padding: '8px 16px', fontSize: '14px' }}
                         >
-                            <div className="drag-drop-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                                </svg>
+                            📁 Subir desde Galería
+                        </button>
+                        <button
+                            type="button"
+                            className={useUrl ? 'btn' : 'btn-secondary'}
+                            onClick={() => setUseUrl(true)}
+                            style={{ padding: '8px 16px', fontSize: '14px' }}
+                        >
+                            🔗 Usar URL
+                        </button>
+                    </div>
+
+                    {useUrl ? (
+                        // Modo URL
+                        <div className="form-group">
+                            <label className="form-label">URL de la imagen</label>
+                            <input
+                                className="input"
+                                placeholder="https://images.unsplash.com/photo-..."
+                                value={form.img}
+                                onChange={e => setForm({ ...form, img: e.target.value })}
+                            />
+                            <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '6px' }}>
+                                💡 Usa enlaces de Unsplash u otros servicios de imágenes
                             </div>
-                            <div className="drag-drop-text">
-                                <strong>{form.img ? 'Cambiar imagen' : 'Subir imagen'}</strong>
-                                Arrastra una imagen aquí o haz clic para seleccionar
+                        </div>
+                    ) : (
+                        // Modo subir archivo - Mobile friendly
+                        <>
+                            {/* Hidden drag-drop area for desktop compatibility */}
+                            <div
+                                className={`drag-drop-area ${dragOver ? 'drag-over' : ''}`}
+                                onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                                onDragLeave={() => setDragOver(false)}
+                                onDrop={onDrop}
+                                onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                                style={{ display: 'none' }}
+                            >
+                                <div className="drag-drop-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                                    </svg>
+                                </div>
+                                <div className="drag-drop-text">
+                                    <strong>{form.img ? 'Cambiar imagen' : 'Subir imagen'}</strong>
+                                    Arrastra una imagen aquí o haz clic para seleccionar
+                                </div>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFile}
+                                    style={{ display: 'none' }}
+                                />
                             </div>
+
+                            {/* Mobile & Desktop: Upload Button */}
+                            {!form.img && (
+                                <button
+                                    type="button"
+                                    className="btn"
+                                    onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+                                    </svg>
+                                    Seleccionar imagen
+                                </button>
+                            )}
+
+                            {/* Hidden file input */}
                             <input
                                 ref={fileInputRef}
                                 type="file"
@@ -107,55 +179,31 @@ export default function WoodProductForm({ initial, onSave, onCancel }) {
                                 onChange={handleFile}
                                 style={{ display: 'none' }}
                             />
-                        </div>
+                        </>
+                    )}
 
-                        {/* Mobile & Desktop: Upload Button */}
-                        {!form.img && (
+                    {form.img && (
+                        <div className="image-preview-wrap" style={{ marginTop: '12px' }}>
+                            <img
+                                src={form.img}
+                                alt="preview"
+                                className="image-preview"
+                                onError={(e) => { e.target.style.display = 'none' }}
+                            />
                             <button
                                 type="button"
-                                className="btn"
-                                onClick={() => fileInputRef.current && fileInputRef.current.click()}
-                                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                className="remove-image-btn"
+                                onClick={removeImage}
+                                title="Eliminar imagen"
                             >
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
                                 </svg>
-                                Seleccionar imagen
                             </button>
-                        )}
-
-                        {/* Hidden file input */}
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFile}
-                            style={{ display: 'none' }}
-                        />
-                    </>
-                )}
-
-                {form.img && (
-                    <div className="image-preview-wrap" style={{ marginTop: '12px' }}>
-                        <img
-                            src={form.img}
-                            alt="preview"
-                            className="image-preview"
-                            onError={(e) => { e.target.style.display = 'none' }}
-                        />
-                        <button
-                            type="button"
-                            className="remove-image-btn"
-                            onClick={removeImage}
-                            title="Eliminar imagen"
-                        >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-                            </svg>
-                        </button>
-                    </div>
-                )}
-            </div>
+                        </div>
+                    )}
+                </div>
+            )}
 
             <div className="form-section">
                 <div className="form-section-title">Información Básica</div>

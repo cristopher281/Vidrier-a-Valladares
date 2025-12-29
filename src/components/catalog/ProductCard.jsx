@@ -5,7 +5,7 @@ export default function ProductCard({ product, onDetailsClick }) {
     <div className="card">
       <img
         className="product-img"
-        src={product.img ? encodeURI(product.img) : 'https://via.placeholder.com/400x300?text=Vidrio'}
+        src={product.img ? product.img.split('/').map(part => encodeURIComponent(part)).join('/') : 'https://via.placeholder.com/400x300?text=Vidrio'}
         alt={product.name}
       />
       <h4>{product.name}</h4>

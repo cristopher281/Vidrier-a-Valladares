@@ -3,18 +3,13 @@ import { useWoodProducts } from '../../context/WoodProductContext'
 import WoodProductForm from './WoodProductForm'
 
 export default function WoodInventoryTable() {
-    const { woodProducts, deleteWoodProduct, updateWoodProduct, addWoodProduct } = useWoodProducts()
+    const { woodProducts, updateWoodProduct, loading } = useWoodProducts()
     const [editing, setEditing] = useState(null)
 
     const save = (p) => {
-        if (p.id) updateWoodProduct(p.id, p)
-        else addWoodProduct(p)
-        setEditing(null)
-    }
-
-    const handleDelete = (product) => {
-        if (window.confirm(`¿Eliminar "${product.name}"?`)) {
-            deleteWoodProduct(product.id)
+        if (p.id) {
+            updateWoodProduct(p.id, p)
+            setEditing(null)
         }
     }
 
@@ -24,22 +19,46 @@ export default function WoodInventoryTable() {
         return <span className="badge ok">Disponible</span>
     }
 
+    if (loading) {
+        return (
+            <div className="fade-in" style={{ textAlign: 'center', padding: '4rem' }}>
+                <div style={{ fontSize: '48px', marginBottom: '1rem' }}>⌛</div>
+                <h3>Cargando productos...</h3>
+            </div>
+        )
+    }
+
     return (
         <div className="fade-in">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h3 style={{ margin: 0 }}>Productos de Madera</h3>
-                <button className="btn" onClick={() => setEditing({})}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ display: 'inline', marginRight: 6 }}>
-                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                    </svg>
-                    Nuevo Producto de Madera
-                </button>
+            <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 style={{ margin: 0 }}>Productos de Madera</h3>
+                    <div style={{
+                        padding: '8px 16px',
+                        background: 'rgba(59, 130, 246, 0.1)',
+                        border: '1px solid rgba(59, 130, 246, 0.2)',
+                        borderRadius: '8px',
+                        color: '#60a5fa',
+                        fontSize: '14px',
+                        fontWeight: '600'
+                    }}>
+                        📦 {woodProducts.length} productos
+                    </div>
+                </div>
+                <p style={{ color: 'var(--muted)', fontSize: '14px', marginTop: '8px', marginBottom: 0 }}>
+                    ℹ️ Las imágenes están hardcodeadas. Solo puedes editar el nombre, precio, stock, categoría y descripción.
+                </p>
             </div>
 
             {editing && (
                 <div className="card fade-in" style={{ marginBottom: '1.5rem' }}>
-                    <h4 style={{ marginTop: 0 }}>{editing.id ? 'Editar Producto de Madera' : 'Nuevo Producto de Madera'}</h4>
-                    <WoodProductForm initial={editing} onSave={save} onCancel={() => setEditing(null)} />
+                    <h4 style={{ marginTop: 0 }}>Editar Producto de Madera</h4>
+                    <WoodProductForm
+                        initial={editing}
+                        onSave={save}
+                        onCancel={() => setEditing(null)}
+                        imageReadOnly={true}
+                    />
                 </div>
             )}
 
@@ -51,8 +70,8 @@ export default function WoodInventoryTable() {
                             <path d="M12 8v8M8 12h8" />
                         </svg>
                     </div>
-                    <h3 style={{ color: 'var(--muted-2)' }}>No hay productos de madera</h3>
-                    <p>Agrega tu primer producto de madera usando el botón "Nuevo Producto de Madera"</p>
+                    <h3 style={{ color: 'var(--muted-2)' }}>Cargando productos...</h3>
+                    <p>Espera un momento mientras se cargan los productos desde Firebase</p>
                 </div>
             ) : (
                 <div className="inventory-grid fade-in-stagger">
@@ -60,9 +79,10 @@ export default function WoodInventoryTable() {
                         <div key={p.id} className="inventory-card fade-in">
                             <div className="inventory-thumb-wrap">
                                 <img
-                                    src={p.img ? encodeURI(p.img) : 'https://via.placeholder.com/160x120?text=Madera'}
+                                    src={p.img || 'https://via.placeholder.com/160x120?text=Madera'}
                                     alt={p.name}
                                     className="inventory-thumb"
+                                    onError={(e) => { e.target.src = 'https://via.placeholder.com/160x120?text=Error' }}
                                 />
                                 {p.featured && (
                                     <div style={{
@@ -103,19 +123,10 @@ export default function WoodInventoryTable() {
                                     <button
                                         className="action-btn"
                                         onClick={() => setEditing(p)}
-                                        title="Editar"
+                                        title="Editar información"
                                     >
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                                             <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                                        </svg>
-                                    </button>
-                                    <button
-                                        className="action-btn delete"
-                                        onClick={() => handleDelete(p)}
-                                        title="Eliminar"
-                                    >
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
                                         </svg>
                                     </button>
                                 </div>

@@ -1,84 +1,19 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { subscribeToCollection, addDocument, updateDocument, deleteDocument } from '../firebase/firestore'
-import { migrateToFirestore } from '../utils/migrateToFirestore'
+import { collection, onSnapshot, doc, setDoc, updateDoc } from 'firebase/firestore'
+import { db } from '../firebase/config'
+import { WOOD_PRODUCT_IMAGES } from '../data/woodProductsImages'
 
 const WoodProductContext = createContext()
 
-const SAMPLE_WOOD_PRODUCTS = [
-    {
-        name: 'Puerta Principal de Caoba',
-        category: 'Puertas',
-        price: 4500,
-        stock: 8,
-        img: 'https://images.unsplash.com/photo-1534172964899-ce7de3e9295c?q=80&w=800&auto=format&fit=crop',
-        description: 'Puerta de madera de caoba maciza con diseño clásico. Incluye marco y herrajes de bronce.',
-        featured: false
-    },
-    {
-        name: 'Ventana de Madera Doble Hoja',
-        category: 'Ventanas',
-        price: 2800,
-        stock: 12,
-        img: 'https://images.unsplash.com/photo-1571864652421-98c7e7076fb5?q=80&w=800&auto=format&fit=crop',
-        description: 'Ventana de pino tratado con doble acristalamiento. Excelente aislamiento térmico y acústico.',
-        featured: true
-    },
-    {
-        name: 'Escritorio Ejecutivo',
-        category: 'Escritorios',
-        price: 6200,
-        stock: 5,
-        img: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?q=80&w=800&auto=format&fit=crop',
-        description: 'Escritorio de nogal con cajones laterales. Diseño profesional para oficina.',
-        featured: true
-    },
-    {
-        name: 'Librero Modular',
-        category: 'Muebles',
-        price: 3800,
-        stock: 7,
-        img: 'https://images.unsplash.com/photo-1594620302200-9a762244a156?q=80&w=800&auto=format&fit=crop',
-        description: 'Librero de 5 repisas en madera de roble. Sistema modular ajustable.',
-        featured: false
-    },
-    {
-        name: 'Puerta Interior Minimalista',
-        category: 'Puertas',
-        price: 2200,
-        stock: 15,
-        img: 'https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?q=80&w=800&auto=format&fit=crop',
-        description: 'Puerta de diseño contemporáneo en madera de cedro. Perfecta para interiores modernos.',
-        featured: false
-    },
-    {
-        name: 'Mesa de Juntas Personalizada',
-        category: 'A Medida',
-        price: 12000,
-        stock: 2,
-        img: 'https://images.unsplash.com/photo-1595428773691-3df8c4e8c94c?q=80&w=800&auto=format&fit=crop',
-        description: 'Mesa de juntas para 12 personas en madera de caoba. Hecha a la medida según especificaciones.',
-        featured: false
-    },
-    {
-        name: 'Ventana Tipo Guillotina',
-        category: 'Ventanas',
-        price: 3200,
-        stock: 6,
-        img: 'https://images.unsplash.com/photo-1599619351208-3e6906b8524f?q=80&w=800&auto=format&fit=crop',
-        description: 'Ventana estilo colonial con sistema de contrapesos. Madera de pino barnizada.',
-        featured: false
-    },
-    {
-        name: 'Closet Empotrado',
-        category: 'Muebles',
-        price: 8500,
-        stock: 3,
-        img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=800&auto=format&fit=crop',
-        description: 'Sistema de closet empotrado con puertas corredizas. Incluye organización interna.',
-        featured: false
-    }
-]
+/**
+ * Este Context combina:
+ * 1. Las rutas de imágenes HARDCODEADAS (no se pueden cambiar)
+ * 2. La información editable desde Firebase (nombre, descripción, precio, etc.)
+ * 
+ * Solo la información se sincroniza en tiempo real con Firebase.
+ * Las imágenes siempre usan las rutas fijas del archivo woodProductsImages.js
+ */
 
 export function WoodProductProvider({ children }) {
     const [woodProducts, setWoodProducts] = useState([])
@@ -86,57 +21,109 @@ export function WoodProductProvider({ children }) {
     const [error, setError] = useState(null)
 
     useEffect(() => {
-        let unsubscribe = null
+        // Referencias a Firebase
+        const productsRef = collection(db, 'woodProducts')
 
-        const initializeWoodProducts = async () => {
-            try {
-                // Intentar migrar datos de localStorage a Firestore
-                await migrateToFirestore('woodProducts', 'vv_wood_products', SAMPLE_WOOD_PRODUCTS)
+        // Suscripción en tiempo real a los cambios en Firebase
+        const unsubscribe = onSnapshot(
+            productsRef,
+            async (snapshot) => {
+                try {
+                    // Obtener datos de Firebase
+                    const firebaseData = {}
+                    snapshot.forEach((doc) => {
+                        firebaseData[doc.id] = { id: doc.id, ...doc.data() }
+                    })
 
-                // Suscribirse a cambios en tiempo real
-                unsubscribe = subscribeToCollection('woodProducts', (data) => {
-                    setWoodProducts(data)
+                    // Si no hay datos en Firebase, inicializar con valores por defecto
+                    if (snapshot.empty) {
+                        console.log('Inicializando productos de madera en Firebase...')
+
+                        for (const imageConfig of WOOD_PRODUCT_IMAGES) {
+                            const defaultProduct = {
+                                name: imageConfig.defaultName,
+                                category: imageConfig.defaultCategory,
+                                description: 'Excelente producto de madera de alta calidad.',
+                                price: 3500,
+                                stock: 10,
+                                featured: false,
+                                createdAt: new Date().toISOString()
+                            }
+
+                            await setDoc(doc(db, 'woodProducts', imageConfig.id), defaultProduct)
+                        }
+                        return // El onSnapshot se va a disparar de nuevo con los nuevos datos
+                    }
+
+                    // Combinar las imágenes hardcodeadas con la información de Firebase
+                    const mergedProducts = WOOD_PRODUCT_IMAGES.map(imageConfig => {
+                        const firebaseInfo = firebaseData[imageConfig.id] || {
+                            name: imageConfig.defaultName,
+                            category: imageConfig.defaultCategory,
+                            description: 'Excelente producto de madera de alta calidad.',
+                            price: 3500,
+                            stock: 10,
+                            featured: false
+                        }
+
+                        return {
+                            id: imageConfig.id,
+                            img: imageConfig.imagePath, // ← RUTA HARDCODEADA (nunca cambia)
+                            name: firebaseInfo.name,
+                            category: firebaseInfo.category,
+                            description: firebaseInfo.description,
+                            price: firebaseInfo.price,
+                            stock: firebaseInfo.stock,
+                            featured: firebaseInfo.featured || false
+                        }
+                    })
+
+                    setWoodProducts(mergedProducts)
                     setLoading(false)
-                })
-            } catch (err) {
-                console.error('Error initializing wood products:', err)
+                } catch (err) {
+                    console.error('Error procesando productos:', err)
+                    setError(err.message)
+                    setLoading(false)
+                }
+            },
+            (err) => {
+                console.error('Error en la suscripción de Firebase:', err)
                 setError(err.message)
                 setLoading(false)
             }
-        }
+        )
 
-        initializeWoodProducts()
-
-        // Cleanup: desuscribirse cuando el componente se desmonte
-        return () => {
-            if (unsubscribe) unsubscribe()
-        }
+        return () => unsubscribe()
     }, [])
-
-    const addWoodProduct = async (p) => {
-        try {
-            const { id, ...productData } = p
-            await addDocument('woodProducts', productData)
-        } catch (err) {
-            console.error('Error adding wood product:', err)
-            throw err
-        }
-    }
 
     const updateWoodProduct = async (id, patch) => {
         try {
-            await updateDocument('woodProducts', id, patch)
+            // Solo permitir actualizar información, no la imagen
+            const { img, ...allowedFields } = patch
+
+            if (img) {
+                console.warn('No se puede cambiar la ruta de la imagen. Las imágenes están hardcodeadas.')
+            }
+
+            const productRef = doc(db, 'woodProducts', id)
+            await updateDoc(productRef, {
+                ...allowedFields,
+                updatedAt: new Date().toISOString()
+            })
         } catch (err) {
-            console.error('Error updating wood product:', err)
+            console.error('Error actualizando producto:', err)
             throw err
         }
     }
 
-    const deleteWoodProduct = async (id) => {
+    const toggleFeaturedWood = async (id) => {
         try {
-            await deleteDocument('woodProducts', id)
+            const product = woodProducts.find(p => p.id === id)
+            if (product) {
+                await updateWoodProduct(id, { featured: !product.featured })
+            }
         } catch (err) {
-            console.error('Error deleting wood product:', err)
+            console.error('Error toggling featured:', err)
             throw err
         }
     }
@@ -144,22 +131,13 @@ export function WoodProductProvider({ children }) {
     const searchWoodProducts = (q) => {
         if (!q) return woodProducts
         const s = q.toLowerCase()
-        return woodProducts.filter(p => p.name.toLowerCase().includes(s) || (p.description || '').toLowerCase().includes(s))
+        return woodProducts.filter(p =>
+            p.name.toLowerCase().includes(s) ||
+            (p.description || '').toLowerCase().includes(s)
+        )
     }
 
     const lowStockWood = woodProducts.filter(p => p.stock < 10)
-
-    const toggleFeaturedWood = async (id) => {
-        try {
-            const product = woodProducts.find(p => p.id === id)
-            if (product) {
-                await updateDocument('woodProducts', id, { featured: !product.featured })
-            }
-        } catch (err) {
-            console.error('Error toggling featured wood product:', err)
-            throw err
-        }
-    }
 
     const getFeaturedWoodProducts = () => {
         return woodProducts.filter(p => p.featured === true)
@@ -168,9 +146,7 @@ export function WoodProductProvider({ children }) {
     return (
         <WoodProductContext.Provider value={{
             woodProducts,
-            addWoodProduct,
             updateWoodProduct,
-            deleteWoodProduct,
             searchWoodProducts,
             lowStockWood,
             toggleFeaturedWood,

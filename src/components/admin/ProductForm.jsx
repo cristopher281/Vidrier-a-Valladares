@@ -240,16 +240,43 @@ export default function ProductForm({ initial, onSave, onCancel }) {
         {form.img && (
           <div className="image-preview-wrap">
             <img src={form.img} alt="preview" className="image-preview" />
-            <button
-              type="button"
-              className="remove-image-btn"
-              onClick={removeImage}
-              title="Eliminar imagen"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-              </svg>
-            </button>
+
+            {/* Check if image is from public gallery (read-only) */}
+            {PUBLIC_IMAGES.includes(form.img) ? (
+              <div style={{
+                marginTop: '12px',
+                padding: '12px',
+                background: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid rgba(59, 130, 246, 0.3)',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '14px',
+                color: 'var(--primary)'
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
+                </svg>
+                <div>
+                  <strong>Imagen de galería pública</strong>
+                  <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '2px' }}>
+                    Esta imagen no se puede cambiar. Solo puedes editar la información del producto.
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="remove-image-btn"
+                onClick={removeImage}
+                title="Eliminar imagen"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                </svg>
+              </button>
+            )}
           </div>
         )}
       </div>
